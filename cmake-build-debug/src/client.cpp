@@ -20,6 +20,10 @@
 
 using namespace std;
 
+int clientHandle(SOCKET connectSocket){
+
+}
+
 int createClient(int argc, char **argv) {
     WSADATA wsadata;
     SOCKET connectSocket = INVALID_SOCKET;
