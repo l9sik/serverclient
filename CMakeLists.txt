@@ -3,4 +3,4 @@ project(serverclient)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(serverclient main.cpp)
+add_executable(serverclient cmake-build-debug/src/main.cpp cmake-build-debug/src/header.h cmake-build-debug/src/server.cpp cmake-build-debug/src/server.h)
