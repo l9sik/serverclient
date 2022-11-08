@@ -7,8 +7,9 @@
 
 
 class server {
-    
+    public:
+        int startServer();
 };
 
 
-#endif //SERVERCLIENT_SERVER_H
+#endif SERVERCLIENT_SERVER_H

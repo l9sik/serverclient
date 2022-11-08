@@ -67,6 +67,18 @@ build CMakeFiles/serverclient.dir/src/client.cpp.obj: CXX_COMPILER__serverclient
   OBJECT_DIR = CMakeFiles\serverclient.dir
   OBJECT_FILE_DIR = CMakeFiles\serverclient.dir\src
 
+build CMakeFiles/serverclient.dir/src/message.cpp.obj: CXX_COMPILER__serverclient_Debug D$:/develop/projects/serverclient/cmake-build-debug/src/message.cpp || cmake_object_order_depends_target_serverclient
+  DEP_FILE = CMakeFiles\serverclient.dir\src\message.cpp.obj.d
+  FLAGS = -g -std=gnu++14
+  OBJECT_DIR = CMakeFiles\serverclient.dir
+  OBJECT_FILE_DIR = CMakeFiles\serverclient.dir\src
+
+build CMakeFiles/serverclient.dir/src/thsQueue.cpp.obj: CXX_COMPILER__serverclient_Debug D$:/develop/projects/serverclient/cmake-build-debug/src/thsQueue.cpp || cmake_object_order_depends_target_serverclient
+  DEP_FILE = CMakeFiles\serverclient.dir\src\thsQueue.cpp.obj.d
+  FLAGS = -g -std=gnu++14
+  OBJECT_DIR = CMakeFiles\serverclient.dir
+  OBJECT_FILE_DIR = CMakeFiles\serverclient.dir\src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target serverclient
@@ -75,7 +87,7 @@ build CMakeFiles/serverclient.dir/src/client.cpp.obj: CXX_COMPILER__serverclient
 #############################################
 # Link the executable serverclient.exe
 
-build serverclient.exe: CXX_EXECUTABLE_LINKER__serverclient_Debug CMakeFiles/serverclient.dir/src/main.cpp.obj CMakeFiles/serverclient.dir/src/server.cpp.obj CMakeFiles/serverclient.dir/src/client.cpp.obj
+build serverclient.exe: CXX_EXECUTABLE_LINKER__serverclient_Debug CMakeFiles/serverclient.dir/src/main.cpp.obj CMakeFiles/serverclient.dir/src/server.cpp.obj CMakeFiles/serverclient.dir/src/client.cpp.obj CMakeFiles/serverclient.dir/src/message.cpp.obj CMakeFiles/serverclient.dir/src/thsQueue.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\serverclient.dir
