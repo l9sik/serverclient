@@ -1,0 +1,4 @@
+# ninja log v5
+0	1111	6890773286387138	CMakeFiles/serverclient.dir/src/main.cpp.obj	e411a66967a956a0
+55	2691	6890773301919424	CMakeFiles/serverclient.dir/src/client.cpp.obj	bde3d8ce72817fef
+61	2724	6890773302482152	CMakeFiles/serverclient.dir/src/server.cpp.obj	2c579c554cb30316
