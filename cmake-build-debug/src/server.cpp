@@ -20,6 +20,8 @@ using namespace std;
 
 char *helloMessage = "hello from server!";
 
+
+//ATOMIC ATOMIC ATOMIC ATOMIC ATOMIC ATOMIC ATOMIC
 SOCKET clientSockets[DEFAULT_CLIENT_NUMBER];
 
 atomic<bool> messageHandleRunning;
@@ -34,8 +36,7 @@ void messageHandle(thsQueue<message> &queue){
     messageHandleRunning = false;
 }
 
-int clientHandle(SOCKET listenSocket, sockaddr_in address, int fromIndex) {
-
+int clientHandle(SOCKET &listenSocket, sockaddr_in &address, int fromIndex) {
     int max_sd = listenSocket;
     int activity;
     char buffer[DEFAULT_BUFLEN];
@@ -44,6 +45,7 @@ int clientHandle(SOCKET listenSocket, sockaddr_in address, int fromIndex) {
     thread messageHandleThread = thread(messageHandle, ref(queue));
     messageHandleThread.join();
     SOCKET *clients = &clientSockets[fromIndex];
+
     while(messageHandleRunning) {
         FD_ZERO(&readfds);
         for (int i = 0; i < DEFAULT_CLIENT_NUMBER_THREAD; i++) {
@@ -83,46 +85,54 @@ int clientHandle(SOCKET listenSocket, sockaddr_in address, int fromIndex) {
 }
 
 int masterSocketHandle(SOCKET listenSocket, sockaddr_in address) {
-    char *buffer = new char[1024];
     //initialising client sockets
     for (int i = 0; i < DEFAULT_CLIENT_NUMBER; i++) {
         clientSockets[i] = 0;
     }
 
-
     int clientThreadsCount = DEFAULT_CLIENT_HANDLE_THREAD_COUNT(DEFAULT_CLIENT_NUMBER, DEFAULT_CLIENT_NUMBER_THREAD);
-    thread *clientHandleThreads[clientThreadsCount];
+    thread clientHandleThreads[clientThreadsCount];
 
-    /*int fromIndex = 0;
+    int fromIndex = 0;
     for (int i = 0; i < clientThreadsCount; i++)
     {
-        thread temp(clientHandle, listenSocket, address, fromIndex);
-        clientHandleThreads[i] = &temp;
+        clientHandleThreads[i] = thread(clientHandle, ref(listenSocket), ref(address), fromIndex);
+        clientHandleThreads[i].join();
         fromIndex = i * DEFAULT_CLIENT_NUMBER_THREAD;
-    }*/
+    }
 
+    fd_set set;
     while (messageHandleRunning) {
+        FD_ZERO(&set);
+        FD_SET(listenSocket, &set);
         sockaddr_in newAddress;
         int addressLen = sizeof newAddress;
-        SOCKET newSocket = accept(listenSocket, (sockaddr *) &newAddress, &addressLen);
-        if (newSocket == -1) {
-            cout << "New client connection fail" << endl;
-            return -1;
+        int activity = select(listenSocket + 1, &set, NULL, NULL, NULL);
+        if (activity < 0){
+            cout << "master socket activity error" << endl;
         }
-        cout << "New Connection, fd: " << newSocket
-             << " ip: " << inet_ntoa(newAddress.sin_addr)
-             << " port: " << address.sin_port << endl;
-        if (send(newSocket, helloMessage, strlen(helloMessage), 0) != strlen(helloMessage)) {
-            cout << "send error";
-        }
-        for (int i = 0; i < DEFAULT_CLIENT_NUMBER; i++) {
-            if (clientSockets[i] == 0) {
-                clientSockets[i] = newSocket;
-                cout << "adding client to client list, index: " << i << endl;
-                break;
+        if (FD_ISSET(listenSocket, &set)) {
+            SOCKET newSocket = accept(listenSocket, (sockaddr *) &newAddress, &addressLen);
+            if (newSocket == -1) {
+                cout << "New client connection fail" << endl;
+                return -1;
+            }
+            cout << "New Connection, fd: " << newSocket
+                 << " ip: " << inet_ntoa(newAddress.sin_addr)
+                 << " port: " << address.sin_port << endl;
+            if (send(newSocket, helloMessage, strlen(helloMessage), 0) != strlen(helloMessage)) {
+                cout << "send error";
+            }
+            for (int i = 0; i < DEFAULT_CLIENT_NUMBER; i++) {
+                if (clientSockets[i] == 0) {
+                    clientSockets[i] = newSocket;
+                    cout << "adding client to client list, index: " << i << endl;
+                    break;
+                }
             }
         }
     }
+    return 0;
 }
 
 int server::startServer() {

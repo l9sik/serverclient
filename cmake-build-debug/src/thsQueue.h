@@ -10,7 +10,6 @@
 
 template <class T>
 class thsQueue {
-    int sz;
     std::mutex _lock;
     std::queue<T> queue;
 public:

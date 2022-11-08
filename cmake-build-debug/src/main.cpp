@@ -4,6 +4,5 @@
 
 int main() {
     server serv;
-    serv.startServer();
-    return 0;
+    return serv.startServer();;
 }
