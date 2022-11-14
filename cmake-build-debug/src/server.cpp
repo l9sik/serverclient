@@ -4,16 +4,6 @@
 #undef UNICODE
 #include "header.h"
 
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iostream>
-#include <thread>
-#include "atomic"
-#include "server.h"
-#include "thsQueue.h"
-#include "message.h"
-
 #pragma comment (lib, "Ws2_32.lib")
 
 using namespace std;
@@ -21,39 +11,43 @@ using namespace std;
 char *helloMessage = "hello from server!";
 
 
-//ATOMIC ATOMIC ATOMIC ATOMIC ATOMIC ATOMIC ATOMIC
-SOCKET clientSockets[DEFAULT_CLIENT_NUMBER];
+client** clientSockets;
 
 atomic<bool> messageHandleRunning;
-void messageHandle(thsQueue<message> &queue){
+void messageHandle(thsQueue<serverMessage>* queue){
     int msgType = -1;
+    msgHandle* msgHD = new msgHandle(queue);
     while (msgType != 0) {
-        while (queue.empty()){}
-        message msg = queue.pop();
+        while (queue->empty()){}
+        serverMessage msg = queue->pop();
         msgType = msg.getType();
-        //message handle
+        msgHD->execute(msg);
+        delete &msg;
     }
+    delete msgHD;
     messageHandleRunning = false;
 }
 
 int clientHandle(SOCKET &listenSocket, sockaddr_in &address, int fromIndex) {
     int max_sd = listenSocket;
     int activity;
-    char buffer[DEFAULT_BUFLEN];
+    char* buffer = new char[DEFAULT_BUFLEN];
     fd_set readfds;
-    thsQueue<message> queue{};
-    thread messageHandleThread = thread(messageHandle, ref(queue));
+    thsQueue<serverMessage>* messageQueue = new thsQueue<serverMessage>();
+    thread messageHandleThread = thread(messageHandle, messageQueue);
     messageHandleThread.join();
-    SOCKET *clients = &clientSockets[fromIndex];
+    client **clients = &clientSockets[fromIndex];
 
     while(messageHandleRunning) {
         FD_ZERO(&readfds);
         for (int i = 0; i < DEFAULT_CLIENT_NUMBER_THREAD; i++) {
-            int sd = clients[i];
-            if (sd > 0) {
-                FD_SET(sd, &readfds);
+            if (clients[i]->isState(STATE_ONLINE)) {
+                int sd =(int)clients[i]->getSocket();
+                if (sd > 0) {
+                    FD_SET(sd, &readfds);
+                }
+                if (sd > max_sd) max_sd = sd + 1;
             }
-            if (sd > max_sd) max_sd = sd + 1;
         }
 
         activity = select(max_sd, &readfds, NULL, NULL, NULL);
@@ -65,19 +59,19 @@ int clientHandle(SOCKET &listenSocket, sockaddr_in &address, int fromIndex) {
         for (int i = 0; i < DEFAULT_CLIENT_NUMBER_THREAD; i++) {
             sockaddr_in clientAddress;
             int addrSize = sizeof clientAddress;
-            if (FD_ISSET(clients[i], &readfds) != 0) {
+            if (FD_ISSET(clients[i]->getSocket(), &readfds) != 0) {
                 int valRead;
-                if ((valRead = recv(clients[i], buffer, DEFAULT_BUFLEN, 0)) == 0) {
+                if ((valRead = recv(clients[i]->getSocket(), buffer, DEFAULT_BUFLEN, 0)) == 0) {
+                    clients[i]->setState(STATE_OFFLINE);
                     cout << "Client disconnected" << endl;
-                    getpeername(clients[i], (sockaddr *) &clientAddress, &addrSize);
-                    cout << "fd: " << clients[i]
+                    getpeername(clients[i]->getSocket(), (sockaddr *) &clientAddress, &addrSize);
+                    cout << "fd: " << clients[i]->getSocket()
                          << " ip: " << inet_ntoa(clientAddress.sin_addr)
                          << " port: " << clientAddress.sin_port << endl;
-                    closesocket(clients[i]);
-                    clients[i] = 0;
+                    closesocket(clients[i]->getSocket());
                 } else {
-                    message msg(clients[i], buffer, valRead);
-                    queue.push(msg);
+                    serverMessage* msg = new serverMessage(clients[i], buffer, valRead);
+                    messageQueue->push(*msg);
                 }
             }
         }
@@ -86,8 +80,9 @@ int clientHandle(SOCKET &listenSocket, sockaddr_in &address, int fromIndex) {
 
 int masterSocketHandle(SOCKET listenSocket, sockaddr_in address) {
     //initialising client sockets
+    clientSockets = new client*[DEFAULT_CLIENT_NUMBER];
     for (int i = 0; i < DEFAULT_CLIENT_NUMBER; i++) {
-        clientSockets[i] = 0;
+        clientSockets[i] = new client();
     }
 
     int clientThreadsCount = DEFAULT_CLIENT_HANDLE_THREAD_COUNT(DEFAULT_CLIENT_NUMBER, DEFAULT_CLIENT_NUMBER_THREAD);
@@ -124,12 +119,14 @@ int masterSocketHandle(SOCKET listenSocket, sockaddr_in address) {
                 cout << "send error";
             }
             for (int i = 0; i < DEFAULT_CLIENT_NUMBER; i++) {
-                if (clientSockets[i] == 0) {
-                    clientSockets[i] = newSocket;
+                if (clientSockets[i]->isState(STATE_OFFLINE)) {
+                    clientSockets[i]->setSocket(newSocket);
+                    clientSockets[i]->setState(STATE_ONLINE | STATE_UNDEFINED);
                     cout << "adding client to client list, index: " << i << endl;
                     break;
                 }
             }
+        }else {
         }
     }
     return 0;

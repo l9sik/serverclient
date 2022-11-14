@@ -1,4 +1,4 @@
-"D:\develop\CLion 2022.2.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=D:/develop/CLion 2022.2.4/bin/ninja/win/ninja.exe" -G Ninja -S D:\develop\projects\serverclient -B D:\develop\projects\serverclient\cmake-build-debug
+"D:\CLion\CLion 2022.2.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S D:\!Univer\serverClient -B D:\!Univer\serverClient\cmake-build-debug
 -- Configuring done
 -- Generating done
--- Build files have been written to: D:/develop/projects/serverclient/cmake-build-debug
+-- Build files have been written to: D:/!Univer/serverClient/cmake-build-debug

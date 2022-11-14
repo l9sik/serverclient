@@ -12,6 +12,22 @@
 #define DEFAULT_CLIENT_NUMBER_THREAD 30
 #define DEFAULT_CLIENT_NUMBER 30
 #define DEFAULT_CLIENT_HANDLE_THREAD_COUNT(a, b) ((a) / (b))
+#define FILE_ID_CLIENT "..\\resource\\id-client.dat"
 
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iostream>
+#include <fstream>
+#include <thread>
+#include "atomic"
+#include "server.h"
+#include "thsQueue.h"
+#include "serverMessage.h"
+#include "client.h"
+#include "genID.cpp"
+#include "msgHandle.h"
+#include "msgGen.h"
+#include "appHelper.h"
 
 #endif //SERVERCLIENT_HEADER_H
