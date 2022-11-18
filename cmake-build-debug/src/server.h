@@ -5,6 +5,8 @@
 #ifndef SERVERCLIENT_SERVER_H
 #define SERVERCLIENT_SERVER_H
 
+#include "header.h"
+
 
 class server {
     public:

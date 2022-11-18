@@ -20,6 +20,8 @@ public:
     int getType();
     client* getClient();
     char* getBuffer();
+
+    serverMessage(client *pClient, char *string, int i);
 };
 
 

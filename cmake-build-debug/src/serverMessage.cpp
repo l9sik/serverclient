@@ -17,7 +17,7 @@ serverMessage::~serverMessage(){
 }
 
 int serverMessage::getType() {
-    return (int)(this->buffer[0]);
+    return (int)buffer[0];
 }
 
 client* serverMessage::getClient(){

@@ -2,9 +2,10 @@
 // Created by Dell on 31.10.2022.
 //
 #undef UNICODE
-#include "header.h"
 
 #pragma comment (lib, "Ws2_32.lib")
+
+#include "header.h"
 
 using namespace std;
 
@@ -21,7 +22,13 @@ void messageHandle(thsQueue<serverMessage>* queue){
         while (queue->empty()){}
         serverMessage msg = queue->pop();
         msgType = msg.getType();
+        cout << "thread [ "
+            << this_thread::get_id()
+            << " ]  - received " << msgType << " - type message" << endl;
         msgHD->execute(msg);
+        cout << "thread [ "
+            << this_thread::get_id()
+            << " ] - ended message handling" << endl;
         delete &msg;
     }
     delete msgHD;
@@ -41,12 +48,13 @@ int clientHandle(SOCKET &listenSocket, sockaddr_in &address, int fromIndex) {
     while(messageHandleRunning) {
         FD_ZERO(&readfds);
         for (int i = 0; i < DEFAULT_CLIENT_NUMBER_THREAD; i++) {
-            if (clients[i]->isState(STATE_ONLINE)) {
+            if (clients[i]->try_lock() && clients[i]->isState(STATE_ONLINE)) {
                 int sd =(int)clients[i]->getSocket();
                 if (sd > 0) {
                     FD_SET(sd, &readfds);
                 }
                 if (sd > max_sd) max_sd = sd + 1;
+                clients[i]->unlock();
             }
         }
 
@@ -57,21 +65,33 @@ int clientHandle(SOCKET &listenSocket, sockaddr_in &address, int fromIndex) {
         }
 
         for (int i = 0; i < DEFAULT_CLIENT_NUMBER_THREAD; i++) {
-            sockaddr_in clientAddress;
-            int addrSize = sizeof clientAddress;
-            if (FD_ISSET(clients[i]->getSocket(), &readfds) != 0) {
-                int valRead;
-                if ((valRead = recv(clients[i]->getSocket(), buffer, DEFAULT_BUFLEN, 0)) == 0) {
-                    clients[i]->setState(STATE_OFFLINE);
-                    cout << "Client disconnected" << endl;
-                    getpeername(clients[i]->getSocket(), (sockaddr *) &clientAddress, &addrSize);
-                    cout << "fd: " << clients[i]->getSocket()
-                         << " ip: " << inet_ntoa(clientAddress.sin_addr)
-                         << " port: " << clientAddress.sin_port << endl;
-                    closesocket(clients[i]->getSocket());
+            if (clients[i]->try_lock()) {
+                sockaddr_in clientAddress;
+                int addrSize = sizeof clientAddress;
+                if (FD_ISSET(clients[i]->getSocket(), &readfds) != 0) {
+                    int valRead;
+                    if ((valRead = recv(clients[i]->getSocket(), buffer, DEFAULT_BUFLEN, 0)) == 0) {
+                        clients[i]->setState(STATE_OFFLINE);
+                        cout << "Client disconnected" << endl;
+                        getpeername(clients[i]->getSocket(), (sockaddr *) &clientAddress, &addrSize);
+                        cout << "fd: " << clients[i]->getSocket()
+                             << " ip: " << inet_ntoa(clientAddress.sin_addr)
+                             << " port: " << clientAddress.sin_port << endl;
+                        closesocket(clients[i]->getSocket());
+                        //save messages for this id
+                        clients[i]->unlock();
+                    } else {
+                        serverMessage *msg = new serverMessage(clients[i], buffer, valRead);
+                        clients[i]->unlock();
+                        messageQueue->push(*msg);
+                    }
                 } else {
-                    serverMessage* msg = new serverMessage(clients[i], buffer, valRead);
-                    messageQueue->push(*msg);
+                    //handle send messages for this id
+                    if (clients[i]->isState(STATE_ONLINE)) {
+                        //remember deadlocks!!!!!!!!
+                        clients[i]->unlock();
+                    }else
+                        clients[i]->unlock();
                 }
             }
         }
@@ -84,6 +104,10 @@ int masterSocketHandle(SOCKET listenSocket, sockaddr_in address) {
     for (int i = 0; i < DEFAULT_CLIENT_NUMBER; i++) {
         clientSockets[i] = new client();
     }
+
+    fileHandler = new fileHandle();
+
+    sendMessages = new map<int, thsQueue<serverMessage>*>();
 
     int clientThreadsCount = DEFAULT_CLIENT_HANDLE_THREAD_COUNT(DEFAULT_CLIENT_NUMBER, DEFAULT_CLIENT_NUMBER_THREAD);
     thread clientHandleThreads[clientThreadsCount];
@@ -122,11 +146,10 @@ int masterSocketHandle(SOCKET listenSocket, sockaddr_in address) {
                 if (clientSockets[i]->isState(STATE_OFFLINE)) {
                     clientSockets[i]->setSocket(newSocket);
                     clientSockets[i]->setState(STATE_ONLINE | STATE_UNDEFINED);
-                    cout << "adding client to client list, index: " << i << endl;
+                    cout << "Adding client to client list, index: " << i << endl;
                     break;
                 }
             }
-        }else {
         }
     }
     return 0;
@@ -144,7 +167,6 @@ int server::startServer() {
     struct addrinfo hints;
 
     sockaddr_in address;
-
 
     int iSendResult;
     char recvbuf[DEFAULT_BUFLEN];

@@ -12,7 +12,8 @@
 #define DEFAULT_CLIENT_NUMBER_THREAD 30
 #define DEFAULT_CLIENT_NUMBER 30
 #define DEFAULT_CLIENT_HANDLE_THREAD_COUNT(a, b) ((a) / (b))
-#define FILE_ID_CLIENT "..\\resource\\id-client.dat"
+#define FILE_ID_CLIENT "..\\resource\\clients\\id-client.dat"
+#define FILE_ID_CHATS "..\\resource\\chats\\id-chats.dat"
 
 #include <windows.h>
 #include <winsock2.h>
@@ -20,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
+#include <map>
 #include "atomic"
 #include "server.h"
 #include "thsQueue.h"
@@ -29,5 +31,10 @@
 #include "msgHandle.h"
 #include "msgGen.h"
 #include "appHelper.h"
+#include "fileHandle.h"
+
+std::map<int, thsQueue<serverMessage>*>* sendMessages;
+
+fileHandle *fileHandler;
 
 #endif //SERVERCLIENT_HEADER_H

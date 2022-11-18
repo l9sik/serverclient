@@ -24,6 +24,9 @@ public:
     client(SOCKET socket, int id);
     client(SOCKET socket);
     client();
+    void lock();
+    void unlock();
+    bool try_lock();
     void setID(int id);
     int setID();
     void setState(STATE state);
