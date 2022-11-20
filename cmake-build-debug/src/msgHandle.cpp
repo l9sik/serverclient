@@ -29,11 +29,12 @@ void msgHandle::identifyClient(serverMessage msg){
         int id = appHelper::charArrToInt(&buffer[1]);
         if (id == -1){
             id = cl->setID();
-            appHelper::saveID(CLIENT_DIRECTORY, id);
+            appHelper::saveID(CLIENT, id);
             cl->removeState(STATE_UNDEFINED);
         }else{
             if (appHelper::isID(CLIENT_DIRECTORY, id)){
                 cl->setID(id);
+                cl->createSocketFile();
                 cl->removeState(STATE_UNDEFINED);
             }else {
                 isClient = false;
@@ -55,7 +56,15 @@ void msgHandle::textMessage(serverMessage msg) {
             int fromID = appHelper::charArrToInt(&buffer[1]);
             int chatID = appHelper::charArrToInt(&buffer[1 + (sizeof(int))]);
             if (appHelper::isID(CHAT_DIRECTORY, chatID)) {
-
+                MsgConverter msgconv(buffer, msg.getSize());
+                char* fileMsg = msgconv.getBuff();
+                int size = msgconv.getSize();
+                if (size > 0) {
+                    std::string path = CHAT_DIRECTORY;
+                    path += "\\" + std::to_string(chatID) + "msgs.dat";
+                    fileHandler->addMessageToChat(path, fileMsg, size);
+                    sendIdentify(cl, true);
+                }
             }
         }
     }

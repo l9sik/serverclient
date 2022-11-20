@@ -128,6 +128,30 @@ serverclient/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\serverclient.dir\build.make CMakeFiles/serverclient.dir/build
 .PHONY : serverclient/fast
 
+src/MsgConverter.obj: src/MsgConverter.cpp.obj
+.PHONY : src/MsgConverter.obj
+
+# target to build an object file
+src/MsgConverter.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\serverclient.dir\build.make CMakeFiles/serverclient.dir/src/MsgConverter.cpp.obj
+.PHONY : src/MsgConverter.cpp.obj
+
+src/MsgConverter.i: src/MsgConverter.cpp.i
+.PHONY : src/MsgConverter.i
+
+# target to preprocess a source file
+src/MsgConverter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\serverclient.dir\build.make CMakeFiles/serverclient.dir/src/MsgConverter.cpp.i
+.PHONY : src/MsgConverter.cpp.i
+
+src/MsgConverter.s: src/MsgConverter.cpp.s
+.PHONY : src/MsgConverter.s
+
+# target to generate assembly for a file
+src/MsgConverter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\serverclient.dir\build.make CMakeFiles/serverclient.dir/src/MsgConverter.cpp.s
+.PHONY : src/MsgConverter.cpp.s
+
 src/appHelper.obj: src/appHelper.cpp.obj
 .PHONY : src/appHelper.obj
 
@@ -377,6 +401,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... serverclient
+	@echo ... src/MsgConverter.obj
+	@echo ... src/MsgConverter.i
+	@echo ... src/MsgConverter.s
 	@echo ... src/appHelper.obj
 	@echo ... src/appHelper.i
 	@echo ... src/appHelper.s

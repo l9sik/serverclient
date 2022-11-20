@@ -82,6 +82,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="D:/!Univer/serverClient/cmake-build-debug/src/MsgConverter.cpp">
+			<Option target="serverclient"/>
+		</Unit>
+		<Unit filename="D:/!Univer/serverClient/cmake-build-debug/src/MsgConverter.h">
+			<Option target="serverclient"/>
+		</Unit>
 		<Unit filename="D:/!Univer/serverClient/cmake-build-debug/src/appHelper.cpp">
 			<Option target="serverclient"/>
 		</Unit>

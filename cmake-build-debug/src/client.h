@@ -38,6 +38,7 @@ public:
     STATE getState();
     int toBytes(char*& buff);
     bool isState(STATE state);
+    void createSocketFile();
 };
 
 #endif //SERVERCLIENT_CLIENT_H

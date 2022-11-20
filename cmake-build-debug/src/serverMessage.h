@@ -5,8 +5,8 @@
 #ifndef SERVERCLIENT_SERVERMESSAGE_H
 #define SERVERCLIENT_SERVERMESSAGE_H
 
-#include <winsock.h>
 #include "header.h"
+
 
 
 class serverMessage {
@@ -15,13 +15,15 @@ class serverMessage {
     int size;
 public:
     //to add: check for correct format while creating
-    serverMessage(client* cl, char* buffer, int size);
     ~serverMessage();
+
+    serverMessage(client *pClient, char *buffer, int size);
+    serverMessage(client *pClient);
+    static serverMessage* getSendMessages(client *pClient, int* size);
     int getType();
     client* getClient();
     char* getBuffer();
-
-    serverMessage(client *pClient, char *string, int i);
+    int getSize();
 };
 
 

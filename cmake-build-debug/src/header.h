@@ -15,13 +15,16 @@
 #define FILE_ID_CLIENT "..\\resource\\clients\\id-client.dat"
 #define FILE_ID_CHATS "..\\resource\\chats\\id-chats.dat"
 
+#include <ctime>
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
 #include <fstream>
+#include <dir.h>
 #include <thread>
 #include <map>
+#include <filesystem>
 #include "atomic"
 #include "server.h"
 #include "thsQueue.h"
@@ -32,6 +35,7 @@
 #include "msgGen.h"
 #include "appHelper.h"
 #include "fileHandle.h"
+#include "MsgConverter.h"
 
 std::map<int, thsQueue<serverMessage>*>* sendMessages;
 

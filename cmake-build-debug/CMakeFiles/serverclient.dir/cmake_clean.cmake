@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/serverclient.dir/src/MsgConverter.cpp.obj"
+  "CMakeFiles/serverclient.dir/src/MsgConverter.cpp.obj.d"
   "CMakeFiles/serverclient.dir/src/appHelper.cpp.obj"
   "CMakeFiles/serverclient.dir/src/appHelper.cpp.obj.d"
   "CMakeFiles/serverclient.dir/src/client.cpp.obj"

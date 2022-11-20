@@ -14,11 +14,13 @@ class fileHandle {
 public:
     fileHandle();
     ~fileHandle();
+    void createSocketFile(client* pClient);
     void addToFile(const std::string&, char* buffer, int size);
     char** getArrayFromFile(const std::string& path, int* bufsize, int tsize);
     void addMessageToChat(const std::string&, char* buffer, int size);
     int readInt(const std::string &path);
     int getNumOfHandledMessages(const std::string &path, int ID-chat);
+    serverMessage** getClientSendMessages(client* pClient, int *msgCount);
 };
 
 struct clientInfo{
@@ -26,9 +28,13 @@ struct clientInfo{
     char surname[20];
 };
 
-struct chatInfo{
+struct clientChats{
     int ID_chat;
     int lastMsg;
+};
+
+struct chatInfo {
+    char name[20];
 };
 
 

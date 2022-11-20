@@ -16,9 +16,9 @@ client** clientSockets;
 
 atomic<bool> messageHandleRunning;
 void messageHandle(thsQueue<serverMessage>* queue){
-    int msgType = -1;
+    int msgType = 0;
     msgHandle* msgHD = new msgHandle(queue);
-    while (msgType != 0) {
+    while (msgType != -1) {
         while (queue->empty()){}
         serverMessage msg = queue->pop();
         msgType = msg.getType();
@@ -87,9 +87,14 @@ int clientHandle(SOCKET &listenSocket, sockaddr_in &address, int fromIndex) {
                     }
                 } else {
                     //handle send messages for this id
-                    if (clients[i]->isState(STATE_ONLINE)) {
+                    if (clients[i]->isState(STATE_ONLINE) && !clients[i]->isState(STATE_UNDEFINED)) {
                         //remember deadlocks!!!!!!!!
+                        //check sendMessages
+                        int size;
+                        serverMessage **msgs = fileHandler->getClientSendMessages(clients[i], &size);
                         clients[i]->unlock();
+                        for (int j = 0; j < size; j++)
+                            messageQueue->push(*msgs[j])
                     }else
                         clients[i]->unlock();
                 }

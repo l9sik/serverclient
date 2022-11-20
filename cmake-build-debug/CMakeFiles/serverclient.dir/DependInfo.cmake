@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "D:/!Univer/serverClient/cmake-build-debug/src/MsgConverter.cpp" "CMakeFiles/serverclient.dir/src/MsgConverter.cpp.obj" "gcc" "CMakeFiles/serverclient.dir/src/MsgConverter.cpp.obj.d"
   "D:/!Univer/serverClient/cmake-build-debug/src/appHelper.cpp" "CMakeFiles/serverclient.dir/src/appHelper.cpp.obj" "gcc" "CMakeFiles/serverclient.dir/src/appHelper.cpp.obj.d"
   "D:/!Univer/serverClient/cmake-build-debug/src/client.cpp" "CMakeFiles/serverclient.dir/src/client.cpp.obj" "gcc" "CMakeFiles/serverclient.dir/src/client.cpp.obj.d"
   "D:/!Univer/serverClient/cmake-build-debug/src/fileHandle.cpp" "CMakeFiles/serverclient.dir/src/fileHandle.cpp.obj" "gcc" "CMakeFiles/serverclient.dir/src/fileHandle.cpp.obj.d"

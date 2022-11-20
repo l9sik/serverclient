@@ -16,6 +16,12 @@ int appHelper::charArrToInt(char* arr){
     return num;
 }
 
+void appHelper::typeToCharArr(char *data, int size, char* arr) {
+    for (int i = 0; i < size; i++){
+        arr[i] = data[i];
+    }
+}
+
 void appHelper::intToCharArr(int num, char* arr){
     arr[0] = (char)((num >> 24) & 0xFF);
     arr[1] = (char)((num >> 16) & 0xFF);
@@ -23,16 +29,36 @@ void appHelper::intToCharArr(int num, char* arr){
     arr[3] = (char)(num & 0xFF);
 }
 
-void appHelper::saveID(std::string directoryPath, int id) {
+void appHelper::saveID(int choose, int id) {
     std::string hash = std::to_string(id);
-    std::ofstream fout(directoryPath + "\\" + hash + ".dat");
+    std::string directoryPath;
+    switch (choose){
+        case (CHAT):
+            directoryPath = CHAT_DIRECTORY;
+            break;
+        case (CLIENT):
+            directoryPath = CLIENT_DIRECTORY;
+            break;
+    }
+    directoryPath += "\\" + hash;
+    mkdir(directoryPath.c_str());
+    std::ofstream fout(directoryPath + "\\info.dat");
+    fout.close();
+    switch (choose){
+        case (CHAT):
+            fout.open(directoryPath + "\\msgs.dat");
+            break;
+        case (CLIENT):
+            fout.open(directoryPath + "\\chats.dat");
+            break;
+    }
     fout.close();
 }
 
 bool appHelper::isID(std::string directoryPath, int id) {
     bool result = true;
     std::string hash = std::to_string(id);
-    std::ifstream fout(directoryPath + "\\" + hash + ".dat", std::ios::binary);
+    std::ifstream fout(directoryPath + "\\" + hash + "info.dat", std::ios::binary);
     if (!fout.is_open()) {
         result = false;
     }
@@ -59,3 +85,4 @@ long appHelper::getFileSize(std::string path) {
     fin.close();
     return pos;
 }
+

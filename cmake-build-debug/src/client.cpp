@@ -78,3 +78,8 @@ void client::addState(STATE state){
 void client::removeState(STATE state){
     this->state = this->state & (~(state));
 }
+void client::createSocketFile(){
+    if ((STATE_ONLINE & state) != 0){
+        fileHandler->createSocketFile(this);
+    }
+}

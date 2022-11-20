@@ -7,8 +7,14 @@
 
 #include "header.h"
 
+#define CHAT 0
+#define CLIENT 1
 #define CLIENT_DIRECTORY "..\\resource\\clients"
 #define CHAT_DIRECTORY "..\\resource\\chats"
+
+#define MESSAGE_IDENTIFY 0
+#define MESSAGE_TEXT 1
+
 
 typedef void (*consumer)(serverMessage msg);
 class msgHandle {
